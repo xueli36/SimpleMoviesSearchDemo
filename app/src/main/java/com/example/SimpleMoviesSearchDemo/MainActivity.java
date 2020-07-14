@@ -22,6 +22,7 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.Key;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -173,9 +174,11 @@ public class MainActivity extends AppCompatActivity {
             MovieData returnCombinedData = new MovieData();
 
             String[] resultTitleStringArr = new String[10];
-            int[] resultPopularityIntArr = new int[10];
             String[] resultPosterURLStringArr = new String[10];
             String[] resultOverviewStringArr = new String[10];
+            Float[] resultPopularityFloatArr = new Float[10];
+            int[] resultReleaseYearIntArr = new int[10];
+            String[] resultGenreNameArr = new String[10];
 
             // Keep track of number of valid results
             int resultSize = 0;
@@ -195,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
                     // Get results
                     InputStream stream = conn.getInputStream();
 
-                    if(stream != null) {
+                    if (stream != null) {
 
                         String urlInputStream = readStream(stream, 100000000);
 
@@ -207,8 +210,7 @@ public class MainActivity extends AppCompatActivity {
 
                         int numOfResultsInt = resultsArray.length();
 
-                        for(int i = 0; i < numOfResultsInt; i++)
-                        {
+                        for (int i = 0; i < numOfResultsInt; i++) {
                             // Get each result in JSON Array as JSON object
                             JSONObject individualResult = resultsArray.getJSONObject(i);
 
@@ -217,29 +219,46 @@ public class MainActivity extends AppCompatActivity {
                             String releaseDate = individualResult.getString("release_date");
                             String posterPath = individualResult.getString("poster_path");
                             String overview = individualResult.getString("overview");
+                            Float popularity = (float) individualResult.getDouble("popularity");
+
+                            // Set Float to 1 decimal point
+                            DecimalFormat df = new DecimalFormat("0.0");
+
+                            popularity = Float.parseFloat(df.format(popularity));
 
                             String baseImageUrl = "https://image.tmdb.org/t/p/w500";
 
                             String fullImageUrl = baseImageUrl + posterPath;
 
-                            // Get popularity and display only top 10 movies with highest rating
-                            int popularity = (int)Double.parseDouble(individualResult.getString("popularity"));
-
                             // Check for invalid or empty release date
-                            if(releaseDate.length() != 0) {
+                            if (releaseDate.length() != 0) {
 
                                 // Manipulate date string to get year only
-                                String releaseYear = releaseDate.substring(0,4);
+                                String releaseYear = releaseDate.substring(0, 4);
 
                                 int releaseYearInt = Integer.parseInt(releaseYear);
 
                                 // Filter by release year and maximum of 10 results
-                                if( (releaseYearInt == 2017 || releaseYearInt == 2018) && resultSize < 10)
-                                {
+                                if ((releaseYearInt == 2017 || releaseYearInt == 2018) && resultSize < 10) {
+
+                                    JSONArray genreArray = individualResult.getJSONArray("genre_ids");
+
+                                    String genreNames = "";
+
+                                    for (int j = 0; j < genreArray.length(); j++) {
+                                        if(!genreNames.isEmpty())
+                                        {
+                                            genreNames += ", ";
+                                        }
+                                        genreNames += getGenre((int) genreArray.get(j));
+                                    }
+
                                     resultTitleStringArr[resultSize] = title;
-                                    resultPopularityIntArr[resultSize] = popularity;
+                                    resultPopularityFloatArr[resultSize] = popularity;
                                     resultPosterURLStringArr[resultSize] = fullImageUrl;
                                     resultOverviewStringArr[resultSize] = overview;
+                                    resultReleaseYearIntArr[resultSize] = releaseYearInt;
+                                    resultGenreNameArr[resultSize] = genreNames;
 
                                     resultSize++;
                                 }
@@ -250,61 +269,60 @@ public class MainActivity extends AppCompatActivity {
                     // Get order of popularity and change array order accordingly
                     // Rank by popularity
                     // Sort array in descending order
-                    //TODO: Sort with doubles not int as will lose precision and give wrong result
-                    Integer[] popularityIntegerArray = new Integer[resultSize];
-                    String[] sortedResultString = new String [resultSize];
-                    String[] sortedImageUrlString = new String [resultSize];
-                    String[] sortedOverviewArray = new String [resultSize];
+                    String[] sortedTitleStringArr = new String[resultSize];
+                    String[] sortedPosterUrlStringArr = new String[resultSize];
+                    String[] sortedOverviewStringArr = new String[resultSize];
+                    String[] sortedGenreStringArr = new String[resultSize];
+                    Float[] sortedPopularityFloatArray = new Float[resultSize];
+                    int[] sortedReleaseYearIntArray = new int[resultSize];
 
                     // Only need to sort if more than 1 result
-                    if(resultSize > 0) {
+                    if (resultSize > 0) {
 
-                        // Convert int array to Integer array
-                        for(int i=0; i<resultSize; i++)
-                        {
-                            popularityIntegerArray[i] = resultPopularityIntArr[i];
+                        // Convert popularity string array to sort
+                        for (int i = 0; i < resultSize; i++) {
+                            sortedPopularityFloatArray[i] = resultPopularityFloatArr[i];
                         }
 
-                        // Sort integer array according to descending order
-                        Arrays.sort(popularityIntegerArray, Collections.reverseOrder());
+                        // Get popularity and display only top 10 movies with highest rating
+                        // Sort array according to descending order
+                        Arrays.sort(sortedPopularityFloatArray, Collections.reverseOrder());
+                    }
 
-                        for(int i=0; i<resultSize; i++)
-                        {
-                            for(int j=0; j<resultPopularityIntArr.length; j++)
-                            {
-                                if(resultPopularityIntArr[j] == popularityIntegerArray[i])
-                                {
-                                    sortedResultString[i] = resultTitleStringArr[j];
-                                    sortedImageUrlString[i] = resultPosterURLStringArr[j];
-                                    sortedOverviewArray[i] = resultOverviewStringArr[j];
-                                }
+                    for (int i = 0; i < resultSize; i++) {
+                        for (int j = 0; j < resultSize; j++) {
+                            if (resultPopularityFloatArr[j].equals(sortedPopularityFloatArray[i])) {
+                                sortedTitleStringArr[i] = resultTitleStringArr[j];
+                                sortedPosterUrlStringArr[i] = resultPosterURLStringArr[j];
+                                sortedOverviewStringArr[i] = resultOverviewStringArr[j];
+                                sortedReleaseYearIntArray[i] = resultReleaseYearIntArr[j];
+                                sortedGenreStringArr[i] = resultGenreNameArr[j];
                             }
                         }
                     }
 
                     // Set sorted array results if sorted
-                    if(resultSize >= 2)
-                    {
-                        returnCombinedData.setMovieTitleArray(sortedResultString);
-                        returnCombinedData.setMoviePosterArray(sortedImageUrlString);
-                        returnCombinedData.setMovieOverviewArray(sortedOverviewArray);
+                    if (resultSize > 0) {
+                        // Convert Float [] array to float[] array
+                        float sortedPopularityfloatArray[] = new float[resultSize];
+
+                        for (int i = 0; i < resultSize; i++) {
+                            sortedPopularityfloatArray[i] = sortedPopularityFloatArray[i];
+                        }
+
+                        returnCombinedData.setMovieTitleArray(sortedTitleStringArr);
+                        returnCombinedData.setMoviePosterArray(sortedPosterUrlStringArr);
+                        returnCombinedData.setMovieOverviewArray(sortedOverviewStringArr);
+                        returnCombinedData.setMoviePopularityArray(sortedPopularityfloatArray);
+                        returnCombinedData.setMovieReleaseYearArray(sortedReleaseYearIntArray);
+                        returnCombinedData.setMovieGenreArray(sortedGenreStringArr);
                         returnCombinedData.setDataEntered(true);
                     }
-                    // Set result array results if not sorted
-                    else if(resultSize == 1)
-                    {
-                        returnCombinedData.setMovieTitleArray(resultTitleStringArr);
-                        returnCombinedData.setMoviePosterArray(resultPosterURLStringArr);
-                        returnCombinedData.setMovieOverviewArray(resultOverviewStringArr);
-                        returnCombinedData.setDataEntered(true);
-                    }
-                }
-                else {
+                } else {
                     popupWarning("Failed connection",
                             "Unable to connect (" + responseCode + ")");
                 }
-            }
-            catch (IOException | JSONException e) {
+            } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
 
@@ -316,28 +334,94 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(MovieData data) {
 
-            if(data.getDataEntered())
-            {
+            if (data.getDataEntered()) {
                 Intent intent = new Intent(MainActivity.this, ResultActivity.class);
 
                 // Create the bundle
                 Bundle bundle = new Bundle();
 
                 // Add data to bundle
-                bundle.putStringArray("movieTitle", data.getMovieTitlesrray());
+                bundle.putStringArray("movieTitle", data.getMovieTitlesArray());
                 bundle.putStringArray("moviePoster", data.getMoviePosterArray());
                 bundle.putStringArray("movieOverview", data.getMovieOverviewArray());
+                bundle.putFloatArray("moviePopularity", data.getMoviePopularityArray());
+                bundle.putIntArray("movieReleaseYear", data.getMovieReleaseYearArray());
+                bundle.putStringArray("movieGenre", data.getMovieGenreArray());
 
                 // Add the bundle to the intent
                 intent.putExtras(bundle);
 
                 startActivity(intent);
-            }
-            else
-            {
+            } else {
                 popupWarning("No result",
                         "No result. Please enter another search.");
             }
+        }
+
+        String getGenre(int genreID) {
+
+            String genreName = "";
+
+            if (genreID == 28) {
+
+                genreName = "Action";
+            }
+            else if (genreID == 12) {
+                genreName = "Comedy";
+            }
+            else if (genreID == 16) {
+                genreName = "Animation";
+            }
+            else if (genreID == 35) {
+                genreName = "Comedy";
+            }
+            else if (genreID == 80){
+                genreName = "Crime";
+            }
+            else if (genreID == 99) {
+                genreName = "Documentary";
+            }
+            else if (genreID == 18) {
+                genreName = "Drama";
+            }
+            else if (genreID == 10751) {
+                genreName = "Family";
+            }
+            else if (genreID == 14) {
+                genreName = "Fantasy";
+            }
+            else if (genreID == 36) {
+                genreName = "History";
+            }
+            else if (genreID == 27) {
+                genreName = "Horror";
+            }
+            else if (genreID == 10402) {
+                genreName = "Music";
+            }
+            else if (genreID == 9648) {
+                genreName = "Mystery";
+            }
+            else if (genreID == 10749) {
+                genreName = "Romance";
+            }
+            else if (genreID == 878) {
+                genreName = "Science Fiction";
+            }
+            else if (genreID == 10770) {
+                genreName = "TV Movie";
+            }
+            else if (genreID == 53) {
+                genreName = "Thriller";
+            }
+            else if (genreID == 10752) {
+                genreName = "War";
+            }
+            else if (genreID == 37) {
+                    genreName = "Western";
+            }
+
+            return genreName;
         }
     }
 }

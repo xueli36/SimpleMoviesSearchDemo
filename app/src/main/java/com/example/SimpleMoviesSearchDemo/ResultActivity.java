@@ -27,17 +27,26 @@ public class ResultActivity extends AppCompatActivity {
         String[] movieTitle = bundle.getStringArray("movieTitle");
         String[] imageUrl = bundle.getStringArray("moviePoster");
         String[] movieOverview = bundle.getStringArray("movieOverview");
+        String[] movieGenre = bundle.getStringArray("movieGenre");
+        float[] moviePopularity = bundle.getFloatArray("moviePopularity");
+        int[] movieReleaseYear = bundle.getIntArray("movieReleaseYear");
 
         // data to populate the RecyclerView with
         ArrayList<String> movieTitleArrayList = new ArrayList<>();
         ArrayList<String> movieImageArrayList = new ArrayList<>();
         ArrayList<String> movieOverviewArrayList = new ArrayList<>();
+        ArrayList<String> movieGenreArrayList = new ArrayList<>();
+        ArrayList<Float> moviePopularityArrayList = new ArrayList<>();
+        ArrayList<Integer> movieReleaseYearArrayList = new ArrayList<>();
 
         // Convert String[] to Array List<String>
         for(int i = 0; i < movieTitle.length; i++) {
             movieTitleArrayList.add(movieTitle[i]);
             movieImageArrayList.add(imageUrl[i]);
             movieOverviewArrayList.add(movieOverview[i]);
+            moviePopularityArrayList.add(moviePopularity[i]);
+            movieReleaseYearArrayList.add(movieReleaseYear[i]);
+            movieGenreArrayList.add(movieGenre[i]);
         }
         recyclerView = findViewById(R.id.my_recycle_view);
 
@@ -51,7 +60,7 @@ public class ResultActivity extends AppCompatActivity {
                 DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(dividerItemDecoration);
 
-        mAdapter = new MyRecyclerViewAdapter(this, movieTitleArrayList, movieImageArrayList, movieOverviewArrayList);
+        mAdapter = new MyRecyclerViewAdapter(this, movieTitleArrayList, movieImageArrayList, movieOverviewArrayList, moviePopularityArrayList, movieReleaseYearArrayList, movieGenreArrayList);
         recyclerView.setAdapter(mAdapter);
     }
 }

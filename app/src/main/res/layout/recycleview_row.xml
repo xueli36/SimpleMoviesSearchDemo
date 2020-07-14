@@ -9,36 +9,64 @@
 
     <ImageView
         android:id="@+id/moviePoster"
-        android:layout_width="150dp"
-        android:layout_height="200dp"
+        android:layout_width="100dp"
+        android:layout_height="120dp"
         android:layout_gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:layout_width="150dp"
-        android:layout_height="200dp"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginLeft="15dp"
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/movieReleaseYear"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:textFontWeight="10"
+            android:textColor="#808080" />
+
+        <TextView
             android:id="@+id/movieTitle"
-            android:layout_width="150dp"
-            android:layout_height="0dp"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:layout_weight="1"
             android:ellipsize="none"
             android:maxLines="5"
             android:scrollHorizontally="false"
+            android:textFontWeight="15"
             android:textColor="#212121" />
 
         <TextView
-            android:id="@+id/movieOverview"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+            android:id="@+id/movieGenre"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="start"
+            android:textFontWeight="8"
+            android:layout_marginTop="5dp"
+            android:textColor="#808080" />
+
+        <TextView
+            android:id="@+id/moviePopularity"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:textFontWeight="8"
+            android:layout_marginTop="15dp"
             android:textColor="#212121" />
 
+<!--     <TextView
+            android:id="@+id/movieOverview"
+            android:layout_width="150dp"
+            android:layout_height="100dp"
+            android:layout_gravity="start"
+            android:textColor="#212121" />
+-->
     </LinearLayout>
 
 </LinearLayout>

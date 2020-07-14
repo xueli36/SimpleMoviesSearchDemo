@@ -5,6 +5,9 @@ class MovieData {
     private String[] movieTitleArray;
     private String[] moviePosterArray;
     private String[] movieOverviewArray;
+    private String[] movieGenreArray;
+    private float[]  moviePopularityArray;
+    private int[]   movieReleaseYearArray;
     private boolean dataEntered = false;
 
     String[] getMoviePosterArray() {
@@ -17,7 +20,7 @@ class MovieData {
         this.moviePosterArray = moviesPoster;
     }
 
-    String[] getMovieTitlesrray() {
+    String[] getMovieTitlesArray() {
 
         return movieTitleArray;
     }
@@ -35,6 +38,36 @@ class MovieData {
     void setMovieOverviewArray(String[] moviesOverview) {
 
         this.movieOverviewArray = moviesOverview;
+    }
+
+    float[] getMoviePopularityArray() {
+
+        return moviePopularityArray;
+    }
+
+    void setMoviePopularityArray(float[] moviesPopularity) {
+
+        this.moviePopularityArray = moviesPopularity;
+    }
+
+    int[] getMovieReleaseYearArray() {
+
+        return movieReleaseYearArray;
+    }
+
+    void setMovieReleaseYearArray(int[] moviesReleaseYear) {
+
+        this.movieReleaseYearArray = moviesReleaseYear;
+    }
+
+    String[] getMovieGenreArray() {
+
+        return movieGenreArray;
+    }
+
+    void setMovieGenreArray(String[] moviesGenre) {
+
+        this.movieGenreArray = moviesGenre;
     }
 
     boolean getDataEntered() {

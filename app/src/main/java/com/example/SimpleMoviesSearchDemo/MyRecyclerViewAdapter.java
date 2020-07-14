@@ -21,14 +21,20 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     private List<String> movieTitle;
     private List<String> moviePoster;
     private List<String> movieOverview;
+    private List<String> movieGenre;
+    private List<Float> moviePopularity;
+    private List<Integer> movieReleaseYear;
     private LayoutInflater mInflater;
 
     // data is passed into the constructor
-    MyRecyclerViewAdapter(Context context, List<String> data, List<String>image, List<String>overview) {
+    MyRecyclerViewAdapter(Context context, List<String> data, List<String>image, List<String>overview, List<Float>popularity, List<Integer>releaseYear, List<String>genre) {
         this.mInflater = LayoutInflater.from(context);
         this.movieTitle = data;
         this.moviePoster = image;
         this.movieOverview = overview;
+        this.moviePopularity = popularity;
+        this.movieReleaseYear = releaseYear;
+        this.movieGenre = genre;
     }
 
     // inflates the row layout from xml when needed
@@ -44,16 +50,28 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         String individualMovieTitle = movieTitle.get(index);
         String individualMoviePoster = moviePoster.get(index);
         String individualMovieOverview = movieOverview.get(index);
-
-        // Set movie title text
-        holder.myTextView.setText(individualMovieTitle);
+        String individualMovieGenre = movieGenre.get(index);
+        String individualMoviePopularity = moviePopularity.get(index).toString();
+        String individualMovieReleaseYear = movieReleaseYear.get(index).toString();
 
         // Get and set movie poster
         new DownloadImageTask(holder.myImageView)
-              .execute(individualMoviePoster);
+                .execute(individualMoviePoster);
+
+        // Set movie title text
+        holder.myTitleView.setText(individualMovieTitle);
+
+        // Set movie title text
+        holder.myPopularityView.setText("Score: " + individualMoviePopularity);
 
         // Set movie overview text
-        holder.myOverviewView.setText(individualMovieOverview);
+        //holder.myOverviewView.setText(individualMovieOverview);
+
+        // Set movie release year text
+        holder.myReleaseYearView.setText(individualMovieReleaseYear);
+
+        // Set movie genre text
+        holder.myGenreView.setText(individualMovieGenre);
 
     }
 
@@ -65,15 +83,21 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
     // stores and recycles views as they are scrolled off screen
     class ViewHolder extends RecyclerView.ViewHolder {
-        TextView myTextView;
         ImageView myImageView;
+        TextView myTitleView;
         TextView myOverviewView;
+        TextView myPopularityView;
+        TextView myReleaseYearView;
+        TextView myGenreView;
 
         ViewHolder(View itemView) {
             super(itemView);
-            myTextView = itemView.findViewById(R.id.movieTitle);
+            myTitleView = itemView.findViewById(R.id.movieTitle);
             myImageView = itemView.findViewById(R.id.moviePoster);
-            myOverviewView = itemView.findViewById(R.id.movieOverview);
+            //myOverviewView = itemView.findViewById(R.id.movieOverview);
+            myPopularityView = itemView.findViewById(R.id.moviePopularity);
+            myReleaseYearView = itemView.findViewById(R.id.movieReleaseYear);
+            myGenreView = itemView.findViewById(R.id.movieGenre);
         }
     }
 
