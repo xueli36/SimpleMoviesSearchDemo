@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Movies Search App</string>
+
+    <string name="configuration_enter_api_text">Enter TMDB API Key:</string>
+    <string name="configuration_title_text">Configure API Key</string>
+    <string name="configuration_button_text">Configure</string>
+
+    <string name="about_credit_text">This app uses data and images from <a href="https://www.themoviedb.org">The Movie Database</a></string>
+
+    <string name="main_search_movie_text">Search Movie:</string>
+    <string name="main_about_btn_text">About</string>
+    <string name="main_search_movie_btn_text">Search</string>
+    <string name="main_configure_btn_text">Configure API Key</string>
+    <string name="main_configure_text">Configure API Key before searching for movies</string>
+
+</resources>
