@@ -1,11 +1,9 @@
 package com.example.SimpleMoviesSearchDemo;
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Base64;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
@@ -15,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -29,12 +28,10 @@ import java.util.Collections;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ConfigureFragment.SendMessage {
 
     TextView txtInputMovieSearch;
-    Button btnSend;
-    Button btnAbout;
-    Button btnConfigureAPI;
+    DrawerLayout dLayout;
 
     static String APIKeyStr = "";
 
@@ -118,32 +115,40 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 1) {
-            if (resultCode == RESULT_OK) {
-                String strEncryptedAPIKey = data.getStringExtra("EncryptedAPIKey");
-                String strEncryptionKey = data.getStringExtra("EncryptionKey");
+    public void SearchMoviesBtnClicked(View v) {
 
-                // Create key and cipher
-                assert strEncryptionKey != null;
-                Key aesKey = new SecretKeySpec(strEncryptionKey.getBytes(), "AES");
-                Cipher cipher;
-                try {
-                    assert strEncryptedAPIKey != null;
-                    byte[] inputByte = strEncryptedAPIKey.getBytes("UTF-8");
+        txtInputMovieSearch = findViewById(R.id.inputTextMovieSearch);
 
-                    cipher = Cipher.getInstance("AES");
+        if(APIKeyStr.length() == 0)
+        {
+            popupWarning("Configure API Key",
+                    "API Key have not been configured. Click on Configure API Key button to configure.");
+        }
+        else
+        {
+            // Get data
+            String inputQueryString = txtInputMovieSearch.getText().toString();
 
-                    // decrypt the text
-                    cipher.init(Cipher.DECRYPT_MODE, aesKey);
+            // Check for valid input
+            if(inputQueryString.length() != 0)
+            {
+                // Use api search function to search for movies
+                String baseUrlString = "https://api.themoviedb.org/3/search/movie?";
+                String apiKey = "api_key=" + APIKeyStr;
+                String fullQueryString = "&query=";
 
-                    APIKeyStr = new String(cipher.doFinal(Base64.decode(inputByte, Base64.DEFAULT)));
+                // Add received movie text search to query string
+                fullQueryString += inputQueryString;
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                String fullUrlString = baseUrlString + apiKey + fullQueryString;
+
+                // Send HTTP request
+                new HttpTask().execute(fullUrlString);
+            }
+            else
+            {
+                popupWarning("Invalid search",
+                        "Search empty. Please enter a search.");
             }
         }
     }
@@ -164,6 +169,42 @@ public class MainActivity extends AppCompatActivity {
             maxReadSize -= readSize;
         }
         return buffer.toString();
+    }
+
+    @Override
+    public void sendData(String message) {
+
+        String strEncryptedAPIKey = message;
+        String strEncryptionKey = "Bar12345Bar12345";
+
+        // Create key and cipher
+        Key aesKey = new SecretKeySpec(strEncryptionKey.getBytes(), "AES");
+        Cipher cipher;
+        try {
+            assert strEncryptedAPIKey != null;
+            byte[] inputByte = strEncryptedAPIKey.getBytes("UTF-8");
+
+            cipher = Cipher.getInstance("AES");
+
+            // decrypt the text
+            cipher.init(Cipher.DECRYPT_MODE, aesKey);
+
+            APIKeyStr = new String(cipher.doFinal(Base64.decode(inputByte, Base64.DEFAULT)));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        MainFragment mainFragment = new MainFragment();
+
+        Bundle bundle = new Bundle();
+        bundle.putString("encrypted", message);
+        mainFragment.setArguments(bundle);
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.frame, mainFragment); // replace a Fragment with Frame Layout
+
+        transaction.commit(); // commit the changes
     }
 
     // Run the HTTP request in a background thread, separating from the main UI thread
@@ -198,12 +239,21 @@ public class MainActivity extends AppCompatActivity {
                     // Get results
                     InputStream stream = conn.getInputStream();
 
-                    if (stream != null) {
+                    StringBuilder response = new StringBuilder();
+                    BufferedReader input = new BufferedReader(new InputStreamReader(stream));
+                    String strLine = null;
+                    while((strLine = input.readLine()) != null)
+                    {
+                        response.append(strLine);
+                    }
+                    input.close();
 
-                        String urlInputStream = readStream(stream, 100000000);
+                    String urlInput = response.toString();
+
+                    if (urlInput != null) {
 
                         // Cast input stream as JSON object
-                        JSONObject reader = new JSONObject(urlInputStream);
+                        JSONObject reader = new JSONObject(urlInput);
 
                         // Get "results" as JSON Array
                         JSONArray resultsArray = reader.getJSONArray("results");
@@ -335,7 +385,6 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(MovieData data) {
 
             if (data.getDataEntered()) {
-                Intent intent = new Intent(MainActivity.this, ResultActivity.class);
 
                 // Create the bundle
                 Bundle bundle = new Bundle();
@@ -348,16 +397,32 @@ public class MainActivity extends AppCompatActivity {
                 bundle.putIntArray("movieReleaseYear", data.getMovieReleaseYearArray());
                 bundle.putStringArray("movieGenre", data.getMovieGenreArray());
 
-                // Add the bundle to the intent
-                intent.putExtras(bundle);
+                // Set main fragment
+                ResultFragment resultFragment = new ResultFragment();
 
-                startActivity(intent);
-            } else {
-                popupWarning("No result",
-                        "No result. Please enter another search.");
+                if (resultFragment != null) {
+
+                    // Setting fragment back stack when pressed back to go back to previous fragment
+                    String backStateName = resultFragment.getClass().getName();
+
+                    boolean fragmentPopped = getSupportFragmentManager().popBackStackImmediate(backStateName, 0);
+
+                    if (!fragmentPopped) {
+                        resultFragment.setArguments(bundle);
+
+                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                        transaction.replace(R.id.frame, resultFragment); // replace a Fragment with Frame Layout
+                        transaction.addToBackStack(backStateName); // commit the changes
+
+                        transaction.commit(); // commit the changes
+                    }
+
+                } else {
+                    popupWarning("No result",
+                            "No result. Please enter another search.");
+                }
             }
         }
-
         String getGenre(int genreID) {
 
             String genreName = "";

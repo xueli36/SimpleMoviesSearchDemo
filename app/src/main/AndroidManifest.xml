@@ -13,10 +13,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
-        android:windowSoftInputMode="adjustResize">
-        <activity android:name=".ConfigurationActivity" />
-        <activity android:name=".ResultActivity" />
-        <activity android:name=".AboutActivity" />
+        android:windowSoftInputMode="adjustResize"
+        tools:ignore="ExtraText">
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ConfigurationActivity">
+    tools:context="com.example.SimpleMoviesSearchDemo.ConfigureFragment">
 
     <TextView
         android:id="@+id/textView3"
         android:layout_width="185dp"
         android:layout_height="33dp"
         android:layout_marginStart="28dp"
-        android:layout_marginLeft="28dp"
         android:layout_marginTop="16dp"
         android:text="@string/configuration_title_text"
         android:textAppearance="@android:style/TextAppearance.Material.Headline"
@@ -24,7 +24,6 @@
         android:layout_width="158dp"
         android:layout_height="40dp"
         android:layout_marginStart="28dp"
-        android:layout_marginLeft="28dp"
         android:layout_marginTop="100dp"
         android:text="@string/configuration_enter_api_text"
         android:textColor="#212121"
@@ -36,7 +35,6 @@
         android:layout_width="325dp"
         android:layout_height="40dp"
         android:layout_marginStart="28dp"
-        android:layout_marginLeft="28dp"
         android:layout_marginTop="144dp"
         android:ems="10"
         android:inputType="textPersonName"
@@ -50,10 +48,10 @@
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="60dp"
         android:layout_marginTop="224dp"
-        android:layout_marginEnd="60dp"
-        android:layout_marginRight="60dp"
         android:text="@string/configuration_button_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>
