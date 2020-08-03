@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Movies Search App</string>
+    <string name="app_name">Movies App</string>
 
     <string name="configuration_enter_api_text">Enter TMDB API Key:</string>
     <string name="configuration_title_text">Configure API Key</string>
@@ -12,5 +12,12 @@
     <string name="main_search_movie_btn_text">Search</string>
     <string name="main_configure_btn_text">Configure API Key</string>
     <string name="main_configure_text">Configure API Key before searching for movies</string>
+
+    <string name="filter_title_text">Filter Search</string>
+    <string name="filter_set_text">Set Filter</string>
+    <string name="filter_sort_popularity_text">By Popularity</string>
+    <string name="filter_sort_adult_text">By Adult</string>
+    <string name="app_label">Movie Search App</string>
+    <string name="search_hint">Input Search Keyword</string>
 
 </resources>
